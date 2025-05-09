@@ -34,10 +34,10 @@ async def connect_to_db():
         pool = await asyncpg.create_pool(
             dsn=DATABASE_URL,
             ssl=ssl_context,
-            command_timeout=30,
+            command_timeout=50,
             min_size=1,
             max_size=2,
-            timeout=30,
+            timeout=50,
             max_inactive_connection_lifetime=10,
             statement_cache_size=0,  # For PgBouncer compatibility
         )
@@ -242,7 +242,7 @@ async def get_articles(offset: int = Query(0, ge=0), limit: int = Query(10, gt=0
         async with pool.acquire() as conn:
             # Fetch articles with pagination
             articles_query = """
-                SELECT id, headline, content, image_url, source, created_at
+                SELECT id, headline, content, image_url, source, created_at,description
                 FROM articles
                 ORDER BY published_at DESC
                 OFFSET $1 LIMIT $2

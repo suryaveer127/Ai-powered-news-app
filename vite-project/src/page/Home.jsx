@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import ArticleCard from '../components/ArticleCard';
-import { fetchArticles } from '../lib/api';
+import { fetchArticles ,fetchArticlesByDate} from '../lib/api';
+import Navbar from '../components/Navbar';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
+
 
 function Home() {
   const [articles, setArticles] = useState([]);
@@ -8,7 +13,7 @@ function Home() {
   const [error, setError] = useState(null);
   const [hasMore, setHasMore] = useState(false);
   const [offset, setOffset] = useState(0);
-  
+const [sortByDate, setSortByDate] = useState(false);
 
   useEffect(() => {
     const loadArticles = async () => {
@@ -26,14 +31,46 @@ function Home() {
     };
     loadArticles();
   }, [offset]);
-
+  const handleSortByDate = async (date) => {
+    setSortByDate(date);
+    setOffset(0);
+    try {
+      setLoading(true);
+      setError(null);
+  
+      // Extract year, month, and day properly
+      const year = date.getUTCFullYear();
+      const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(date.getUTCDate()).padStart(2, '0');
+  
+      const articles = await fetchArticlesByDate(year, month, day);
+      setArticles(articles);
+      setHasMore(false);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-      <div className="max-w-7xl mx-auto px-6 py-10">
+    <div className="min-h-screen bg-white">
+      <Navbar className="max-w-3xl" />
+      <div className="max-w-3xl mx-auto px-6 py-10">
         <div className="flex justify-between items-center mb-10">
-          <h1 className="text-4xl font-extrabold tracking-tight">
+          <h1 className="text-4xl font-extrabold tracking-tight font-serif  ">
             🗞️ Trending News
           </h1>
+           
+          <DatePicker
+  selected={sortByDate}
+  onChange={handleSortByDate}
+  dateFormat="yyyy-MM-dd"
+  className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+  maxDate={new Date()}
+  placeholderText="Select a date"
+/>
+
+
           
         </div>
 
@@ -43,8 +80,8 @@ function Home() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {articles.filter(article => article.content && article.image_url).map(article => (
+        <div className="flex flex-col gap-1 mb-10">
+          {articles.map(article => (
             <ArticleCard key={article.id} article={article} />
           ))}
         </div>
@@ -66,7 +103,9 @@ function Home() {
           </div>
         )}
       </div>
+     
     </div>
+    
   );
 }
 

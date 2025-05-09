@@ -4,7 +4,7 @@ from nltk.tokenize import sent_tokenize
 import nltk
 import asyncio
 nltk.download('punkt')
-
+nltk.data.path.append(r"C:\Users\surya\AppData\Roaming\nltk_data")
 # --- Setup ---
 summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6", device=-1)
 

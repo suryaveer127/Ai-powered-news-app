@@ -1,28 +1,35 @@
-import React from "react"
-import { Link } from "react-router-dom"
+import React from "react";
+import { Link } from "react-router-dom";
+
 export default function ArticleCard({ article }) {
   return (
-    <Link to={`/article/${article.id}`} className="block">
-    <div className="flex flex-col h-full bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-      {article.image_url && (
-        <img
-          src={article.image_url}
-          alt={article.headline}
-          className="w-full h-48 object-cover"
-        />
-      )}
-      <div className="p-4 flex flex-col justify-between flex-grow">
+    <Link to={`/article/${article.id}`} className="block mb-4">
+      <div className="flex flex-row-reverse bg-white">
         
-        <h2 className="text-xl font-semibold text-gray-800 mb-2 break-words">
-          {article.headline}
-        </h2>
-       
-        <div className="text-xs text-gray-400">
-          {article.source} &middot;{" "}
-          {new Date(article.created_at).toLocaleDateString()}
+        {article.image_url && (
+          <img
+            src={article.image_url}
+            alt={article.headline}
+            className="w-36 h-24 object-cover rounded-lg flex-shrink-0"
+          />
+        )}
+        
+        <div className="p-4 flex flex-col justify-between text-gray-900 w-full">
+          <h2 className="text-md font-bold font-s ">
+            {article.headline} 
+          </h2>
+          <h3 className="text-md text-gray-700 font-semibold">
+            {article.description}
+          </h3>
+
+          
+          
+          <div className="text-xs text-gray-600 mt-2">
+            {article.source} &middot;{" "}
+            {new Date(article.created_at).toLocaleDateString()}
+          </div>
         </div>
       </div>
-    </div>
     </Link>
-  )
+  );
 }

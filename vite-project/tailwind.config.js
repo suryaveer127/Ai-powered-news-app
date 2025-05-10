@@ -4,15 +4,17 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  extend: {
-    fontFamily: {
-      sans: ['Inter', 'sans-serif'],         // override default sans
-      serif: ['Merriweather', 'serif'],      // custom serif font
-      mono: ['Fira Code', 'monospace'],      // custom monospaced
-      poppins: ['Poppins', 'sans-serif'],    // new custom font
+  theme: {
+    extend: {
+      fontFamily: {
+        jakarta: ['"Plus Jakarta Sans Variable"'],
+        quickquick: ['"QuickQuick Condensed Italic"', 'sans-serif'],
+        edgeRacer: ['"Edge Racer Engraved Italic"', 'sans-serif'],
+        quadrillion: ['"Quadrillion"', 'sans-serif'],
+      },
+      
     },
   },
-  
-  plugins: [],
-}
+    plugins: [require('tailwind-scrollbar-hide')],
 
+}

@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-
+import { FaPlayCircle } from "react-icons/fa";
+import { CiPause1 } from "react-icons/ci";
 export default function ArticleDetail() {
   const { id } = useParams();
   const [article, setArticle] = useState(null);
   const [summary, setSummary] = useState("");
   const [error, setError] = useState("");
   const [showSummary, setShowSummary] = useState(false);
+  const [audio, setAudio] = useState(null);
+  const [audioUrl, setAudioUrl] = useState("");
+  const [isPlaying, setIsPlaying] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,6 +52,61 @@ export default function ArticleDetail() {
       console.error(err);
     }
   };
+
+const fetchArticleAudio = async () => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/article/${id}/summary/audio`);
+    const data = await response.json();
+
+    if (response.ok) {
+      const audioUrl = data.audio_url;
+      
+      // Create a new Audio instance only if it doesn't exist
+      if (!audio) {
+        const newAudio = new Audio(audioUrl);
+        setAudio(newAudio);
+
+        newAudio.addEventListener('ended', () => {
+          setIsPlaying(false);
+        });
+        
+        newAudio.play();  // Play the audio
+        setIsPlaying(true);  // Update state to reflect that audio is playing
+      } else {
+        // If audio is already present, toggle play/pause
+        if (!isPlaying) {
+          audio.play();
+          setIsPlaying(true);
+        } else {
+          audio.pause();
+          setIsPlaying(false);
+        }
+      }
+
+    } else {
+      setError(data.error || "Failed to fetch audio");
+    }
+  } catch (err) {
+    setError("Error fetching audio");
+    console.error(err);
+  }
+};
+
+  // Function to handle audio play/pause
+  const handleAudioPlayPause = () => {
+    if (audio) {
+      if (!isPlaying) {
+        audio.play();
+        setIsPlaying(true); // Set the state to playing
+      } else {
+        audio.pause();
+        setIsPlaying(false); // Set the state to not playing
+      }
+    }
+  }
+
+  // Function to handle audio pause
+ 
 
   if (error) return <div className="text-red-500 p-4">{error}</div>;
   if (!article) return <div className="p-4 text-white">Loading...</div>;
@@ -101,7 +160,11 @@ export default function ArticleDetail() {
               >
                 Close Summary
               </button>
+             
+              
+              
             </>
+            
           ) : (
             <button
               onClick={fetchSummary}

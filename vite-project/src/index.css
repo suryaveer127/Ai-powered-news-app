@@ -2,5 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 body {
-  @apply font-sans; /* or font-poppins, etc. */
+  font-family: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+ 
 }
+@font-face {
+  font-family: "Quadrillion";
+  font-style: normal;
+  font-weight: 400;
+  src: url("https://db.onlinewebfonts.com/t/87f72dfc88ac9977f4a1c7b2af0c6a51.eot");
+  src: url("https://db.onlinewebfonts.com/t/87f72dfc88ac9977f4a1c7b2af0c6a51.eot?#iefix") format("embedded-opentype"),
+       url("https://db.onlinewebfonts.com/t/87f72dfc88ac9977f4a1c7b2af0c6a51.woff2") format("woff2"),
+       url("https://db.onlinewebfonts.com/t/87f72dfc88ac9977f4a1c7b2af0c6a51.woff") format("woff"),
+       url("https://db.onlinewebfonts.com/t/87f72dfc88ac9977f4a1c7b2af0c6a51.ttf") format("truetype"),
+       url("https://db.onlinewebfonts.com/t/87f72dfc88ac9977f4a1c7b2af0c6a51.svg#QuadrillionW05-Regular") format("svg");
+}
+
+@font-face {
+  font-family: "Quadrillion";
+  font-style: italic;
+  font-weight: 400;
+  src: url("https://db.onlinewebfonts.com/t/4bd6de27f7f63b7c9d6ae5ff8e3d574a.eot");
+  src: url("https://db.onlinewebfonts.com/t/4bd6de27f7f63b7c9d6ae5ff8e3d574a.eot?#iefix") format("embedded-opentype"),
+       url("https://db.onlinewebfonts.com/t/4bd6de27f7f63b7c9d6ae5ff8e3d574a.woff2") format("woff2"),
+       url("https://db.onlinewebfonts.com/t/4bd6de27f7f63b7c9d6ae5ff8e3d574a.woff") format("woff"),
+       url("https://db.onlinewebfonts.com/t/4bd6de27f7f63b7c9d6ae5ff8e3d574a.ttf") format("truetype"),
+       url("https://db.onlinewebfonts.com/t/4bd6de27f7f63b7c9d6ae5ff8e3d574a.svg#QuadrillionW05-Italic") format("svg");
+}
+
+.react-datepicker__header {
+  @apply bg-gradient-to-r from-blue-500 to-indigo-600 text-white;
+}
+
+.react-datepicker__triangle {
+  border-top-color: #4f46e5; /* Adjust this color to match the gradient */
+}
+

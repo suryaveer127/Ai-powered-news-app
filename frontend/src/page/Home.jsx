@@ -49,11 +49,7 @@ function Home() {
   };
 
   // Reset to today's articles when clicking logo/app name
-  const handleResetToToday = () => {
-    setSortByDate(null);  // Reset date filter to today
-    setOffset(0); // Reset offset to load from the start
-    setArticles([]); // Clear articles
-  };
+ 
 
   
 
@@ -61,10 +57,10 @@ function Home() {
     <div className="min-h-screen">
       <Navbar onDateChange={handleSortByDate} selectedDate={sortByDate} />
       <div className="max-w-3xl mx-auto px-6 py-10">
-        <div className="flex justify-between items-center mb-10">
+        <div className="flex justify-between items-center mb-10  pb-2">
           <h1
-            className="text-4xl font-extrabold tracking-tight font-jakarta text-gray-900 cursor-pointer"
-            onClick={handleResetToToday} // Reset to today when clicked
+            className="text-3xl font-bold tracking-tight font-jakarta text-gray-900  relative inline-block after:absolute after:left-0 after:bottom-0 after:w-full after:h-1 after:bg-black  pb-2 after:border-b-2 "
+            
           >
             🗞️ Trending News
           </h1>

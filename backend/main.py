@@ -17,8 +17,8 @@ from fastapi.middleware.cors import CORSMiddleware
 load_dotenv()
 
 DB_URL = os.getenv("DATABASE_URL", "postgresql://postgres.bzvinlggnrivnycbfkjv:jaishreeram@aws-0-ap-south-1.pooler.supabase.com:6543/postgres")
-SUPABASE_URL = os.getenv("SUPABASE_URL")  # <-- This should be your Supabase project URL (https://xxxx.supabase.co)
-SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_KEY") or os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 DATABASE_URL = DB_URL  # For asyncpg
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
@@ -200,8 +200,9 @@ async def get_article_summary_audio(
     id: uuid.UUID
 ):
     """
-    Get the audio URL for the summary of an article.
-    If audio is not available, generate summary and audio as needed.
+    Generate the audio for the summary of an article if not present,
+    upload it, store the URL, and return the URL.
+    Do NOT play or stream the audio, just return the URL.
     """
     try:
         async with db_pool.acquire() as conn:
@@ -237,39 +238,23 @@ async def get_article_summary_audio(
                 """
                 await conn.execute(insert_summary_query, id, summary)
 
-            # 4. Generate audio for the summary
+            # 4. Generate audio for the summary and upload to Supabase bucket
             try:
-                audio_url_path = generate_audio_from_text(summary)
-                file_name = os.path.basename(audio_url_path)
-                # Check if the file was actually created and is not empty
-                if not os.path.exists(audio_url_path) or os.path.getsize(audio_url_path) == 0:
-                    logging.error(f"Audio file not created or empty: {audio_url_path}")
-                    return {"error": "Audio file generation failed"}
-                # Upload the file to your Supabase storage bucket here
-                with open(audio_url_path, "rb") as f:
-                    upload_response = supabase.storage.from_("audio-files").upload(file_name, f, {"content-type": "audio/mpeg"})
-                # Check upload response for errors
-                if hasattr(upload_response, "error") and upload_response.error:
-                    logging.error(f"Supabase upload error: {upload_response.error}")
-                    return {"error": f"Supabase upload error: {upload_response.error}"}
-                # Get the public URL
-                public_url = supabase.storage.from_("audio-files").get_public_url(file_name)
-                if not public_url:
-                    logging.error("Failed to get public URL from Supabase.")
-                    return {"error": "Failed to get public URL from Supabase."}
+                public_url = generate_audio_from_text(summary)  # Pass the summary text
+                
+                # Store URL in database
                 insert_audio_query = """
                     INSERT INTO audio_requests (article_id, type, audio_url, requested_at)
                     VALUES ($1, 'summary', $2, NOW())
-                    RETURNING id
                 """
-                audio_req_id = await conn.fetchval(insert_audio_query, id, public_url)
-                if not audio_req_id:
-                    logging.error("Failed to insert audio request into database.")
-                    return {"error": "Failed to insert audio request into database."}
+                await conn.execute(insert_audio_query, id, public_url)
                 return {"audio_url": public_url}
             except Exception as tts_exc:
                 logging.error(f"Audio generation error: {str(tts_exc)}")
-                return {"error": f"Failed to generate audio: {str(tts_exc)}"}
+                return {"error": str(tts_exc)}
+    except Exception as e:
+        logging.error(f"Error in audio generation: {str(e)}")
+        return {"error": str(e)}
     except Exception as e:
         logging.error(f"Error fetching/generating summary audio: {str(e)}")
         return {"error": str(e)}
@@ -284,7 +269,7 @@ async def get_articles(offset: int = Query(0, ge=0), limit: int = Query(10, gt=0
         async with db_pool.acquire() as conn:
             # Fetch articles with pagination
             articles_query = """
-                SELECT id, headline, description,content, image_url, source, created_at
+                SELECT id, headline,description, content, image_url, source, created_at
                 FROM articles
                 ORDER BY published_at DESC
                 OFFSET $1 LIMIT $2
@@ -305,11 +290,11 @@ async def get_articles(offset: int = Query(0, ge=0), limit: int = Query(10, gt=0
 # Route to fetch news articles by date
 @app.get("/{year}/{month}/{date}")
 async def get_news_by_date(year: int, month: int, date: int):
-    pool = None
+
     try:
         logging.info(f"Fetching articles for year={year}, month={month}, date={date}")
-        pool = await connect_to_db()
-        async with pool.acquire() as conn:
+
+        async with db_pool.acquire() as conn:
             query = """
                 SELECT * FROM articles 
                 WHERE EXTRACT(YEAR FROM published_at) = $1
@@ -335,8 +320,3 @@ async def get_news_by_date(year: int, month: int, date: int):
     except Exception as e:
         logging.error(f"Error fetching articles by date: {str(e)}")
         return {"error": str(e)}
-    finally:
-        if pool:
-            await pool.close()
-            logging.info("Database connection pool closed")            
-            

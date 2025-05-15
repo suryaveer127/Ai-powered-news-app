@@ -50,12 +50,12 @@ export const fetchArticles = async (offset = 0, limit = 10) => {
 export const fetchArticlesByDate = async (year, month, day) => {
   try {
     // Construct the API URL with the correct format
-    const url = `${API_BASE_URL}/${year}/${month}/${day}`;
-    
-    console.log('Fetching from URL:', url); // Debugging log
+    const url = `${API_BASE_URL}/date/${year}/${month}/${day}`;
+    // Debugging log
 
     const response = await fetch(url);
-
+    console.log('API Response:', response); // Debugging log to check the response
+  console.lo
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -76,7 +76,7 @@ export const fetchArticlesByDate = async (year, month, day) => {
       description: article.description,
       source: article.source,
       category: article.category,
-      published_At: article.published_at,
+      published_at: article.published_at,
       isKidFriendly: article.is_kid_friendly,
       entities: article.entities || [],
       summary: article.summary || "",

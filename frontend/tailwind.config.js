@@ -7,10 +7,11 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        jakarta: ['"Plus Jakarta Sans Variable"'],
+        jakarta: ['"Plus Jakarta Sans Variable", system-ui, sans-serif'],
         quickquick: ['"QuickQuick Condensed Italic"', 'sans-serif'],
         edgeRacer: ['"Edge Racer Engraved Italic"', 'sans-serif'],
         quadrillion: ['"Quadrillion"', 'sans-serif'],
+        
       },
       
     },

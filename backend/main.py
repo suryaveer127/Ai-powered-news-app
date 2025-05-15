@@ -269,7 +269,7 @@ async def get_articles(offset: int = Query(0, ge=0), limit: int = Query(10, gt=0
         async with db_pool.acquire() as conn:
             # Fetch articles with pagination
             articles_query = """
-                SELECT id, headline,description, content, image_url, source, created_at
+                SELECT id, description,headline, content, image_url, source, created_at
                 FROM articles
                 ORDER BY published_at DESC
                 OFFSET $1 LIMIT $2
@@ -288,7 +288,7 @@ async def get_articles(offset: int = Query(0, ge=0), limit: int = Query(10, gt=0
         return {"error": str(e)}
 
 # Route to fetch news articles by date
-@app.get("/{year}/{month}/{date}")
+@app.get("/date/{year}/{month}/{date}")
 async def get_news_by_date(year: int, month: int, date: int):
 
     try:

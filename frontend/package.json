@@ -12,11 +12,13 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@fontsource/plus-jakarta-sans": "^5.2.5",
     "@heroicons/react": "^1.0.6",
     "@mui/material": "^7.1.0",
     "@mui/x-date-pickers": "^8.3.0",
     "@supabase/supabase-js": "^2.39.0",
     "date-fns": "^2.30.0",
+    "date-fns-tz": "^3.2.0",
     "dayjs": "^1.11.13",
     "gradiently": "^1.0.9",
     "lucide-react": "^0.508.0",
